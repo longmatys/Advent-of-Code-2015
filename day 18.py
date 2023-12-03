@@ -29,7 +29,10 @@ def animate(field_in,field_out):
                     field_out[i][j] = '#'
                 else:
                     field_out[i][j] = '.'
-
+def break_lights(field):
+    for i in [0,len(field)-1]:
+        for j in [0, len(field[0])-1]:
+            field[i][j] = '#'
                 
 if __name__ == '__main__':
 # Get the name of the Python script
@@ -52,6 +55,7 @@ def dump_field(field):
         print(''.join(i))
     print('')
 for i in range(100):
+    break_lights(field_a)
     animate(field_a,field_b)
     #print('INPUT:')
     #dump_field(field_a)
@@ -60,6 +64,7 @@ for i in range(100):
     field_temp = field_a
     field_a = field_b
     field_b = field_temp
+break_lights(field_a)
 counter = 0
 for i in range(len(field_a)):
     for j in range(len(field_a)):
