@@ -44,23 +44,24 @@ def create_candidates(dic):
             res.append(k)
     return res
 
-house = 819000
-def get_presents(elves):
+house = 831600
+def get_presents(elves, house):
     ret = 0
     for elf in elves:
-        ret+= elf*10
+        if elf*50 > house:
+            ret+= elf*11
     return ret
 pres = 0
 while (True or pres<34000000):
     dic = GetPrimeDecomp(house)
     cand = create_candidates(dic)
     all = set(generate_candidates(cand))
-    pres = get_presents(all) + 10
-    if house%1000 == 0:
+    pres = get_presents(all, house)
+    if house%10000 == 0:
         ""
-        #print('prac',house,pres)
+        print(f'Walkit: house {house},presents {pres}')
     if pres>=34000000:
-        print('Over',house,pres)
+        print(f'Over: house {house},presents {pres}')
     house-=1
 print(house-1,pres)
     
