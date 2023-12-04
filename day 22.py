@@ -12,7 +12,8 @@ def evaluate_turn_effects(status):
     global debug
     return_status = deepcopy(status)
     return_status['wizard']['shield'] = 0
-    #if status['turn'] == 'wizard':
+    if status['turn'] == 'wizard':
+        return_status['wizard']['hit points'] -= 1
         
     if len(status['effects']) > 0:
         
