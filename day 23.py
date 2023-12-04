@@ -43,7 +43,7 @@ class computer():
             getattr(self, current[0])(current)
             
 def main():
-    pc = computer(0,0,0,[None])
+    pc = computer(1,0,0,[None])
     # Get the name of the Python script
     script_name = os.path.basename(__file__)
     input_file = script_name.split('.')[0]+'.input.txt'
