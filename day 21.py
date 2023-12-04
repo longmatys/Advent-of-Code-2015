@@ -1,6 +1,7 @@
 import math
 import os
 import json
+import sys
 def init_store(store):
     store_txt = """\
 Weapons*:    Cost  Damage  Armor
@@ -36,7 +37,10 @@ Defense +3:   80     0       3
                 if el == '':
                     continue
                 attrs.append(el)
-            store[store_name] = {'nic':{'Cost': 0, 'Damage': 0, 'Armor': 0}}
+            if store_name != 'Weapons':
+                store[store_name] = {'nic':{'Cost': 0, 'Damage': 0, 'Armor': 0}}
+            else:
+                store[store_name] = {}
             
         else:
             item_name = line.split(':')[0]
@@ -63,23 +67,36 @@ def get_result(me,enemy):
     enemy_needs = math.ceil(me['Hit Points'] / result_enemy)
     me_needs = math.ceil(enemy['Hit Points'] / result_me)
     ret_result = me_needs <= enemy_needs
-    if ret_result:
+    if not ret_result and me['Cost'] > 232:
+        ""
         print(f'Result: Me({me}), Enemy({enemy}), Enemy dmg {result_enemy}, My dmg {result_me}, Vyhraju: {ret_result}, Kol: ja={me_needs}/{enemy["Hit Points"] / result_me}, enemy={enemy_needs}/{me["Hit Points"] / result_enemy}')
+        print(me)
     return ret_result
-    #enemy['Hit Points'] * (enemy['Damage'] - me['Armor'])  = me['Hit Points'] * (me['Damage'] - enemy['Armor']) 
-    #needed_damage = (enemy['Hit Points'] * (enemy['Damage'] - me['Armor']) + me['Hit Points'] * enemy['Armor'] ) / me['Hit Points']
-    #me['Damage']
-    #print(f'Needed damage for {me["Armor"]} armor: {needed_damage}')
+def dump_list(store,me,shop_list):
+    me['Damage'] = 0
+    me['Armor'] = 0
+    me['Cost'] = 0
+    for (store_name,item_name) in shop_list:
+        print(f'{store_name}:{item_name} ({store[store_name][item_name]["Cost"]})')
+        for attr, value in store[store_name][item_name].items():
+            if attr == 'nic':
+                next
+            print(f'{attr}:{value}')
+            me[attr] += value
+        print('')
 def evaluate_list(store,me,enemy,shop_list):
     me['Damage'] = 0
     me['Armor'] = 0
     me['Cost'] = 0
     for (store_name,item_name) in shop_list:
+        #print(item_name,store[store_name][item_name]['Cost'])
         for attr, value in store[store_name][item_name].items():
             if attr == 'nic':
                 next
             me[attr] += value
-    if get_result(me,enemy):
+    if not get_result(me,enemy):
+        if me['Cost'] > 232:
+            print(shop_list)
         return (me['Cost'],shop_list)
     return (None,None)
 def check_rings_duplicity(shop_list,ring_name):
@@ -98,10 +115,21 @@ def find_cheapest_combo(store,me,enemy,visited_shops,shop_list):
             if store_name.startswith('Rings') and item_name !='nic' and check_rings_duplicity(shop_list,item_name):
                     continue
             (value,combo) = find_cheapest_combo(store,me,enemy,visited_shops + [store_name], shop_list + [(store_name,item_name)])
-            if value != None and (best_value == None or  best_value>value):
+            if value != None and (best_value == None or  best_value < value):
+                
                 (best_value,best_combo) = (value,combo)
+                if best_value > 230:
+                    print(best_value)
     return (best_value,best_combo)
-            
+def try_it(enemy):
+    #233 [('Weapons', 'nic'), ('Armor', 'Splintmail',3), ('Rings', 'Damage +3'), ('Rings offhand', 'Defense +3')]
+    me = {
+        'Armor': 6,
+        'Hit Points': 100,
+        'Damage': 3,
+        'Cost': 300
+    }
+    get_result(me,enemy)
 if __name__ == '__main__':
 # Get the name of the Python script
     script_name = os.path.basename(__file__)
@@ -116,10 +144,15 @@ if __name__ == '__main__':
         'Armor': 0,
         'Hit Points': 100,
         'Damage': 10
+        
     }
+    #try_it(enemy)
+    #sys.exit(1)
     get_result(me,enemy)
     store = {}
     init_store(store)
     (v,c) = find_cheapest_combo(store,me, enemy, [], [])
     print(v,c)
     evaluate_list(store,me,enemy,c)
+    #dump_list(store,me,[('Weapons', 'nic'), ('Armor', 'Splintmail'), ('Rings', 'Damage +3'), ('Rings offhand', 'Defense +3')])
+    #233 is too high!
